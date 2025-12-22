@@ -1,0 +1,7 @@
+google-api-python-client==2.187.0
+google-auth-httplib2==0.2.1
+google-auth-oauthlib==1.2.3
+python-dotenv==1.2.1
+youtube-transcript-api==1.2.3
+google-genai==1.55.0
+isodate==0.6.1

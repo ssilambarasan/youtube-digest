@@ -1,0 +1,52 @@
+[
+  {
+    "channel_id": "UCxgY7r-o_ql8ADIdyiQr3Zw",
+    "channel_title": "Snowflake Developers",
+    "uploadsPlaylistId": "UUxgY7r-o_ql8ADIdyiQr3Zw",
+    "videsIds": [
+      {
+        "videoId": "qi3H0XJkGWs",
+        "videoTitle": "How to deliver end-to-end data observability on Snowflake",
+        "videoLengthSecs": 319,
+        "isShort": false
+      },
+      {
+        "videoId": "Qz9AmhRFf18",
+        "videoTitle": "MLOps In Snowflake: From Development To Deployment",
+        "videoLengthSecs": 892,
+        "isShort": false
+      },
+      {
+        "videoId": "IdEGplqX4ls",
+        "videoTitle": "[LIVE] Supercharge AI Agents & Apps - Snowflake Interactive Analytics",
+        "videoLengthSecs": 1896,
+        "isShort": false
+      }
+    ]
+  },
+  {
+    "channel_id": "UCrDwWp7EBBv4NwvScIpBDOA",
+    "channel_title": "Anthropic",
+    "uploadsPlaylistId": "UUrDwWp7EBBv4NwvScIpBDOA",
+    "videsIds": [
+      {
+        "videoId": "nvbq39yVYRk",
+        "videoTitle": "What is sycophancy in AI models?",
+        "videoLengthSecs": 369,
+        "isShort": false
+      },
+      {
+        "videoId": "rBJnWMD0Pho",
+        "videoTitle": "Let Claude handle work in your browser",
+        "videoLengthSecs": 96,
+        "isShort": true
+      },
+      {
+        "videoId": "5KTHvKCrQ00",
+        "videoTitle": "Claude ran a business in our office",
+        "videoLengthSecs": 371,
+        "isShort": false
+      }
+    ]
+  }
+]
