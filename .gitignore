@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment - NEVER COMMIT
+.venv/
+venv/
+ENV/
+env/
+
+# Sensitive credentials - NEVER COMMIT
+auth/client_secret.json
+auth/token.json
+
+# Keep template files
+!auth/client_secret.json.template
+!auth/token.json.template
+
+# Service account keys - NEVER COMMIT
+*service-account*.json
+*-key.json
+test-youtubedigest*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+
