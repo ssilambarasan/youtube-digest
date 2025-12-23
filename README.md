@@ -206,7 +206,7 @@ youtube-digest/
 
 ### Architecture
 
-(screenshots-gifs/Youtube-Digest-Architecture.png)
+![YouTube Digest Architecture](screenshots-gifs/Youtube-Digest-Architecture.png)
 
 1. **Authentication**: Uses OAuth2 to authenticate with YouTube Data API
 2. **Channel Discovery**: Fetches all your YouTube subscriptions
