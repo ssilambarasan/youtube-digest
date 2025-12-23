@@ -204,6 +204,10 @@ youtube-digest/
 
 ## How It Works
 
+### Architecture
+
+(screenshots-gifs/Youtube-Digest-Architecture.png)
+
 1. **Authentication**: Uses OAuth2 to authenticate with YouTube Data API
 2. **Channel Discovery**: Fetches all your YouTube subscriptions
 3. **Channel Selection**: You manually select which channels to monitor
