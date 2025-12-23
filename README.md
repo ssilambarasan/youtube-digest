@@ -2,7 +2,15 @@
 
 Automated YouTube video digest generator that fetches recent videos from your subscribed channels, generates AI-powered summaries using Google's Gemini, and delivers a beautifully formatted HTML email digest.
 
+**Design article:**
+I wrote a short article walking through the thinking behind this project, the design decisions, and what I learned along the way:
+
+[Designing a YouTube Digest for Signal Over Noise](https://dev.to/ssilambarasan/designing-a-youtube-digest-for-signal-over-noise-9c6)
+
+## Email Digest Output
+
 ![Email Digest Sample](screenshots-gifs/Email-Screenshot.jpg)
+
 
 ### Email Digest Features
 
