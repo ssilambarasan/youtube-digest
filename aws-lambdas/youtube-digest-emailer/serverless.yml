@@ -1,0 +1,59 @@
+service: youtube-digest-emailer
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-2
+  stage: prod
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SERVICE_NAME: ${self:service}
+    POSTGRES_DB_URL: neon-postgres-service-account
+    GMAIL_APP_CREDS: google-gmail-app-credentials
+  iam:
+    role: 
+      name: youtube-digest-emailer-role-sls-role
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.POSTGRES_DB_URL}-*
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.GMAIL_APP_CREDS}-*
+
+functions:
+  DigestEmailer:
+    name: youtube-digest-emailer-sls
+    handler: handler.DigestEmailer
+    description: Pulls data from database and emails the youtube videos list.
+    timeout: 900
+    memorySize: 128
+    events:
+        - schedule: cron(30 1 * * ? *)
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    useDownloadCache: true
+    useStaticCache: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'

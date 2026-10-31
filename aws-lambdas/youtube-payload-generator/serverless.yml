@@ -1,0 +1,63 @@
+service: youtube-payload-generator
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-2
+  stage: prod
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SERVICE_NAME: ${self:service}
+    POSTGRES_DB_URL: neon-postgres-service-account
+    SQS_QUEUE_NAME: pull-youtube-videos-by-channel-sqs
+    SQS_QUEUE_URL: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/${self:provider.environment.SQS_QUEUE_NAME}
+  iam:
+    role: 
+      name: youtube-payload-generator-role-sls-role
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: 
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.POSTGRES_DB_URL}-*
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource: arn:aws:sqs:${aws:region}:${aws:accountId}:${self:provider.environment.SQS_QUEUE_NAME}
+
+functions:
+  PayloadGenerator:
+    name: youtube-payload-generator-sls
+    handler: handler.PayloadGenerator
+    description: Prepares payload to extract youtube video ids from upload playlist for youtube channels
+    timeout: 600
+    memorySize: 128
+    events:
+        - schedule: cron(0 1 * * ? *)
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    useDownloadCache: true
+    useStaticCache: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'

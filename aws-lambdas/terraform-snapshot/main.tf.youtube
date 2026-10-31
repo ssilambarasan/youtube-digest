@@ -1,0 +1,154 @@
+# =============================================================================
+# YouTube Digest — Terraform blocks REMOVED from my-aws-infrastructure (ARCHIVED)
+# =============================================================================
+# Source : ssilambarasan/my-aws-infrastructure :: infra/main.tf
+# Commit : 88b1cbad7e6ae8f55d3262ca461cd03e5374dbb1
+# Branch : voyager-deep-scan-infra
+# Date   : 2026-10-31
+#
+# These seven module blocks provisioned the YouTube pipeline's shared AWS
+# resources. They were deleted from infra/main.tf when the project was retired.
+# Kept here verbatim so the project can be rebuilt without digging through git
+# history.
+#
+# The modules they call were NOT deleted — they are shared with job-hunt and
+# Voyager, and still live at:
+#     infra/modules/s3/
+#     infra/modules/lambda/
+#     infra/modules/sqs/
+#     infra/modules/secrets/
+#     infra/modules/parameter-store/
+#
+# To restore: paste these blocks back into infra/main.tf and apply. Note that
+# "project_bucket" uses var.project, which was "youtube-digest".
+#
+# DELIBERATELY NOT REMOVED (shared with job-hunt — do not add these back as if
+# they were YouTube's):
+#   module "neon_postgres_dtabase_secret"        -> neon-postgres-service-account
+#   module "google_gmail_iam_auth_token_secret"  -> google_gmail_iam_auth_token_secret
+# =============================================================================
+
+
+#######################################################################
+# S3 — the youtube-digest bucket (var.project). Only youtube-subscriptions
+# wrote to it, under the all-subscriptions/ prefix. Nothing read it.
+#######################################################################
+
+module "project_bucket" {
+  source      = "./modules/s3"
+  bucket_name = var.project
+  project     = var.project
+
+  local_tags = {
+    purpose = "project-root-bucket"
+  }
+}
+
+#######################################################################
+# Lambda — VESTIGIAL. Created from a placeholder build/bootstrap.zip with
+# ignore_changes on filename/source_code_hash, under the original
+# "Terraform makes the shell, CI pushes the code" design. Superseded by the
+# Serverless-deployed youtube-subscription-fetcher-sls; nothing ever updated
+# this one's code.
+#######################################################################
+
+module "subscription_lambda" {
+  source = "./modules/lambda"
+
+  function_name  = "youtube-subscription-fetcher"
+  role_name      = "youtube-subscription-fetcher-role"
+  handler        = "app.handler"
+  s3_bucket_name = module.project_bucket.bucket_name
+  project        = var.project
+
+  local_tags = {
+    purpose = "fetches-youtube-subscriptions"
+  }
+}
+
+#######################################################################
+# Secrets Manager — YouTube-only secrets.
+# google-service-account      : Google OAuth token for the YouTube Data API.
+#                               Read by youtube-subscriptions,
+#                               youtube-playlist-fetcher, youtube-fetch-videos.
+# google-gmail-app-credentials: Gmail app password used to send the digest.
+#                               Read by youtube-digest-emailer (GMAIL_APP_CREDS).
+# Both were populated by hand in the console; recovery_window_in_days = 7.
+#######################################################################
+
+module "google_service_account_secret" {
+  source = "./modules/secrets"
+
+  secret_name = "google-service-account"
+  description = "This is the google service account to access Youtube Data API for ${var.project}"
+  secret_value = jsonencode({ placeholder = "Replace this value manually in AWS Secrets Manager console" })
+  project     = var.project
+
+  local_tags = {
+    purpose = "youtube-service-account"
+  }
+}
+
+module "google_gmail_app_creds_secret" {
+  source = "./modules/secrets"
+
+  secret_name = "google-gmail-app-credentials"
+  description = "This is the google credential for gmail app to send email for ${var.project}"
+  secret_value = jsonencode({ placeholder = "Replace this value manually in AWS Secrets Manager console" })
+  project     = var.project
+
+  local_tags = {
+    purpose = "youtube-service-account"
+  }
+}
+
+#######################################################################
+# SQS — fan-out between youtube-payload-generator (producer) and
+# youtube-fetch-videos (consumer, batchSize 1), with a DLQ at maxReceiveCount 3.
+#######################################################################
+
+module "pull_youtube_videos_queue" {
+  source = "./modules/sqs"
+
+  queue_name = "pull-youtube-videos-by-channel-sqs"
+  project    = var.project
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = module.pull_youtube_videos_dlq.queue_arn
+    maxReceiveCount     = 3
+  })
+
+  local_tags = {
+    purpose = "main-queue-for-youtube-video-processing"
+  }
+}
+
+module "pull_youtube_videos_dlq" {
+  source = "./modules/sqs"
+
+  queue_name = "pull-youtube-videos-by-channel-sqs-dlq"
+  project    = var.project
+
+  local_tags = {
+    purpose = "dead-letter-queue-for-youtube-video-processing"
+  }
+}
+
+#######################################################################
+# SSM Parameter Store — "ytd" = YouTube Digest. Created but read by no code;
+# the services read Secrets Manager instead. Dead on arrival.
+#######################################################################
+
+module "google-ytd-project-auth-token" {
+  source = "./modules/parameter-store"
+
+  parameter_name = "/google/ytd-project-auth-token"
+  parameter_type = "SecureString"
+  description    = "JSON - Google service account token to access Youtube for youtube-digest google project"
+  project        = var.project
+
+  local_tags = {
+    purpose = "Google OAuth Token for Service Account"
+    scope = "Youtube"
+    type = "Token"
+  }
+}

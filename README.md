@@ -2,6 +2,18 @@
 
 Automated YouTube video digest generator that fetches recent videos from your subscribed channels, generates AI-powered summaries using Google's Gemini, and delivers a beautifully formatted HTML email digest.
 
+> **This repo holds two things.**
+>
+> 1. **The local prototype** — everything at the top level (`main.py`, `subscriptions.py`,
+>    `prepare_payload.py`, `auth/`, `data/`). Runs on your machine against Google APIs.
+>    This is the documentation below, and it is the **only** implementation with AI
+>    summaries, the shorts/long split and video links.
+> 2. **[`aws-lambdas/`](aws-lambdas/README.md) — a RETIRED AWS pipeline, archived.** Five
+>    Lambda services that ran this on a daily cron in `us-west-2` until 2026-10-31, when all
+>    deployments were removed. That version was a reimplementation, not a port, and it had
+>    **no AI summarisation**. Nothing there is deployed. See its README for the pipeline
+>    diagram, known defects and how to revive it.
+
 ![Email Digest Sample](screenshots-gifs/Email-Screenshot.jpg)
 
 ### Email Digest Features

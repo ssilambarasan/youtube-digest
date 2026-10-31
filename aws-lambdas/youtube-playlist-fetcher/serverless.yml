@@ -1,0 +1,57 @@
+service: youtube-playlistid
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-2
+  stage: prod
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SERVICE_NAME: ${self:service}
+    GOOGLE_SERVICE_ACCOUNT_SECRET: google-service-account
+    POSTGRES_DB_URL: neon-postgres-service-account
+  iam:
+    role: 
+      name: youtube-playlistid-fetcher-role-sls-role
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: 
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.GOOGLE_SERVICE_ACCOUNT_SECRET}-*
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.POSTGRES_DB_URL}-*
+
+functions:
+  FetchPlaylistId:
+    name: youtube-playlistid-fetcher-sls
+    handler: handler.FetchPlaylistId
+    description: Enrich upload playlist id for youtube channels
+    timeout: 600
+    memorySize: 128
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    useDownloadCache: true
+    useStaticCache: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'

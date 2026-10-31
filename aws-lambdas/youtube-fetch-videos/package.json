@@ -1,0 +1,14 @@
+{
+  "name": "youtube-subscriptions-lambda",
+  "version": "1.0.0",
+  "description": "YouTube subscriptions Lambda functions",
+  "scripts": {
+    "deploy": "serverless deploy"
+  },
+  "dependencies": {
+    "serverless-python-requirements": "^6.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0"
+  }
+}

@@ -1,0 +1,61 @@
+service: youtube-subscriptions
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-2
+  stage: prod
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SERVICE_NAME: ${self:service}
+    S3_BUCKET: youtube-digest
+    S3_PREFIX: all-subscriptions
+    GOOGLE_SERVICE_ACCOUNT_SECRET: google-service-account
+  iam:
+    role: 
+      name: youtube-subscriptions-fetcher-role-sls-role
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:PutObjectAcl
+          Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET}/${self:provider.environment.S3_PREFIX}/*
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${self:provider.environment.GOOGLE_SERVICE_ACCOUNT_SECRET}-*
+
+functions:
+  FetchAllSubscriptions:
+    name: youtube-subscription-fetcher-sls
+    handler: handler.FetchAllSubscriptions
+    description: Process YouTube subscription events
+    timeout: 300
+    memorySize: 128
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    useDownloadCache: true
+    useStaticCache: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'

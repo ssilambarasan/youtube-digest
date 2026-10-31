@@ -38,3 +38,11 @@ test-youtubedigest*.json
 Thumbs.db
 
 
+# Environment variables - NEVER COMMIT
+.env
+.env.*
+!.env.example
+
+# Serverless Framework / Lambda build artifacts (aws-lambdas/, archived)
+.serverless/
+node_modules/
