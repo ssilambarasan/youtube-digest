@@ -14,6 +14,13 @@ Automated YouTube video digest generator that fetches recent videos from your su
 >    **no AI summarisation**. Nothing there is deployed. See its README for the pipeline
 >    diagram, known defects and how to revive it.
 
+**Design article:**
+I wrote a short article walking through the thinking behind this project, the design decisions, and what I learned along the way:
+
+[Designing a YouTube Digest for Signal Over Noise](https://dev.to/ssilambarasan/designing-a-youtube-digest-for-signal-over-noise-9c6)
+
+## Email Digest Output
+
 ![Email Digest Sample](screenshots-gifs/Email-Screenshot.jpg)
 
 ### Email Digest Features
@@ -215,6 +222,10 @@ youtube-digest/
 ```
 
 ## How It Works
+
+### Architecture
+
+![YouTube Digest Architecture](screenshots-gifs/Youtube-Digest-Architecture.png)
 
 1. **Authentication**: Uses OAuth2 to authenticate with YouTube Data API
 2. **Channel Discovery**: Fetches all your YouTube subscriptions
